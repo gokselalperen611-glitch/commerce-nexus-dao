@@ -25,6 +25,7 @@ import { useStoreOwner } from '../hooks/useStoreOwner';
 import { WalletConnect } from '../components/WalletConnect';
 import { CreateProposalDialog } from '../components/CreateProposalDialog';
 import { TokenPurchaseDialog } from '../components/TokenPurchaseDialog';
+import { RewardSystemNotice } from '../components/RewardSystemNotice';
 
 const StoreDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -166,6 +167,11 @@ const StoreDetail = () => {
               <TrendingUp className="w-8 h-8 text-warning" />
             </div>
           </Card>
+        </div>
+
+        {/* Reward System Notice */}
+        <div className="mb-8">
+          <RewardSystemNotice storeName={store.name} tokenSymbol={store.tokenSymbol} />
         </div>
 
         {/* Wallet Connection */}
