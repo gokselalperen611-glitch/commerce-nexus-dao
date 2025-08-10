@@ -14,9 +14,12 @@ import {
   DollarSign,
   BarChart3,
   Calendar,
-  Trophy
+  Trophy,
+  Loader2
 } from 'lucide-react';
 import { mockStores, mockProposals } from '../data/mockData';
+import { useTokenBalance } from '../hooks/useTokenBalance';
+import { TokenRequiredMessage } from '../components/TokenRequiredMessage';
 
 const StoreDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -49,6 +52,7 @@ const StoreDetail = () => {
   };
 
   const storeProposals = mockProposals.filter(p => p.id <= '2'); // Mock proposals for this store
+  const { balance, loading, canVote, canCreateProposal } = useTokenBalance(store.id, 1000);
 
   return (
     <div className="min-h-screen pt-20 px-6 pb-12">
@@ -164,60 +168,119 @@ const StoreDetail = () => {
           </TabsList>
 
           <TabsContent value="governance" className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Active Proposals</h2>
-              <Button variant="outline" className="border-primary/30">
-                <Vote className="w-4 h-4 mr-2" />
-                Create Proposal
-              </Button>
-            </div>
-            
-            <div className="space-y-4">
-              {storeProposals.map((proposal) => (
-                <Card key={proposal.id} className="p-6 bg-gradient-card border-border/50">
-                  <div className="space-y-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <h3 className="font-semibold text-lg">{proposal.title}</h3>
-                          <Badge 
-                            variant={proposal.status === 'active' ? 'default' : 'secondary'}
-                            className={proposal.status === 'active' ? 'bg-gradient-primary' : ''}
-                          >
-                            {proposal.status}
-                          </Badge>
-                        </div>
-                        <p className="text-muted-foreground mb-3">{proposal.description}</p>
-                        <div className="text-sm text-muted-foreground">
-                          Ends: {proposal.endDate} • Required: {proposal.requiredTokens} tokens
-                        </div>
-                      </div>
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <span className="ml-2 text-muted-foreground">Checking token balance...</span>
+              </div>
+            ) : balance === 0 ? (
+              <TokenRequiredMessage 
+                storeName={store.name}
+                tokenSymbol={store.tokenSymbol}
+                feature="governance"
+              />
+            ) : (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h2 className="text-2xl font-bold">Active Proposals</h2>
+                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                      <span>Your Balance: {balance.toLocaleString()} {store.tokenSymbol}</span>
+                      <Badge variant={canVote ? "default" : "secondary"} className={canVote ? "bg-success" : ""}>
+                        {canVote ? "Can Vote" : "Cannot Vote"}
+                      </Badge>
+                      {canCreateProposal && (
+                        <Badge variant="outline" className="border-primary/50">
+                          Can Create Proposals
+                        </Badge>
+                      )}
                     </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span>For: {proposal.votesFor}</span>
-                        <span>Against: {proposal.votesAgainst}</span>
-                      </div>
-                      <Progress 
-                        value={(proposal.votesFor / (proposal.votesFor + proposal.votesAgainst)) * 100} 
-                        className="h-2"
-                      />
-                      <div className="text-sm text-muted-foreground">
-                        {((proposal.votesFor + proposal.votesAgainst) / proposal.totalVotes * 100).toFixed(1)}% participation
-                      </div>
-                    </div>
-                    
-                    {proposal.status === 'active' && (
-                      <div className="flex space-x-2 pt-2">
-                        <Button size="sm" className="bg-success">Vote For</Button>
-                        <Button size="sm" variant="destructive">Vote Against</Button>
-                      </div>
-                    )}
                   </div>
-                </Card>
-              ))}
-            </div>
+                  {canCreateProposal ? (
+                    <Button variant="outline" className="border-primary/30">
+                      <Vote className="w-4 h-4 mr-2" />
+                      Create Proposal
+                    </Button>
+                  ) : (
+                    <div className="text-right">
+                      <Button variant="outline" disabled className="border-muted/30">
+                        <Vote className="w-4 h-4 mr-2" />
+                        Create Proposal
+                      </Button>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Requires 1,000+ {store.tokenSymbol}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="space-y-4">
+                  {storeProposals.map((proposal) => (
+                    <Card key={proposal.id} className="p-6 bg-gradient-card border-border/50">
+                      <div className="space-y-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <h3 className="font-semibold text-lg">{proposal.title}</h3>
+                              <Badge 
+                                variant={proposal.status === 'active' ? 'default' : 'secondary'}
+                                className={proposal.status === 'active' ? 'bg-gradient-primary' : ''}
+                              >
+                                {proposal.status}
+                              </Badge>
+                            </div>
+                            <p className="text-muted-foreground mb-3">{proposal.description}</p>
+                            <div className="text-sm text-muted-foreground">
+                              Ends: {proposal.endDate} • Required: {proposal.requiredTokens} tokens
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span>For: {proposal.votesFor}</span>
+                            <span>Against: {proposal.votesAgainst}</span>
+                          </div>
+                          <Progress 
+                            value={(proposal.votesFor / (proposal.votesFor + proposal.votesAgainst)) * 100} 
+                            className="h-2"
+                          />
+                          <div className="text-sm text-muted-foreground">
+                            {((proposal.votesFor + proposal.votesAgainst) / proposal.totalVotes * 100).toFixed(1)}% participation
+                          </div>
+                        </div>
+                        
+                        {proposal.status === 'active' && (
+                          <div className="space-y-3 pt-2">
+                            {canVote ? (
+                              <div className="flex space-x-2">
+                                <Button size="sm" className="bg-success">
+                                  Vote For ({balance.toLocaleString()} votes)
+                                </Button>
+                                <Button size="sm" variant="destructive">
+                                  Vote Against ({balance.toLocaleString()} votes)
+                                </Button>
+                              </div>
+                            ) : (
+                              <div className="p-3 bg-muted/20 rounded-lg border border-muted/30">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sm text-muted-foreground">
+                                    Hold {store.tokenSymbol} tokens to vote on this proposal
+                                  </span>
+                                  <Button size="sm" variant="outline" className="border-border/50">
+                                    Get Tokens
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </>
+            )}
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
