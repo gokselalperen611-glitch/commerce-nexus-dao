@@ -20,6 +20,11 @@ import {
 import { mockStores, mockProposals } from '../data/mockData';
 import { useTokenBalance } from '../hooks/useTokenBalance';
 import { TokenRequiredMessage } from '../components/TokenRequiredMessage';
+import { useWallet } from '../hooks/useWallet';
+import { useStoreOwner } from '../hooks/useStoreOwner';
+import { WalletConnect } from '../components/WalletConnect';
+import { CreateProposalDialog } from '../components/CreateProposalDialog';
+import { TokenPurchaseDialog } from '../components/TokenPurchaseDialog';
 
 const StoreDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -52,7 +57,10 @@ const StoreDetail = () => {
   };
 
   const storeProposals = mockProposals.filter(p => p.id <= '2'); // Mock proposals for this store
-  const { balance, loading, canVote, canCreateProposal } = useTokenBalance(store.id, 1000);
+  const { balance, loading, canVote, canCreateProposal, purchaseTokens } = useTokenBalance(store.id, 1000);
+  const wallet = useWallet();
+  const { checkOwnership } = useStoreOwner(wallet.address);
+  const isStoreOwner = checkOwnership(store.id);
 
   return (
     <div className="min-h-screen pt-20 px-6 pb-12">
@@ -101,9 +109,11 @@ const StoreDetail = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Button className="w-full bg-gradient-primary">
-                      Buy {store.tokenSymbol} Tokens
-                    </Button>
+                    <TokenPurchaseDialog 
+                      store={store}
+                      walletConnected={wallet.connected}
+                      onPurchaseComplete={purchaseTokens}
+                    />
                     <Button variant="outline" className="w-full border-border/50">
                       <ExternalLink className="w-4 h-4 mr-2" />
                       Visit Store
@@ -158,6 +168,13 @@ const StoreDetail = () => {
           </Card>
         </div>
 
+        {/* Wallet Connection */}
+        {!wallet.connected && (
+          <div className="mb-8">
+            <WalletConnect />
+          </div>
+        )}
+
         {/* Tabs Content */}
         <Tabs defaultValue="governance" className="space-y-8">
           <TabsList className="grid w-full grid-cols-4 bg-secondary/50">
@@ -196,22 +213,12 @@ const StoreDetail = () => {
                       )}
                     </div>
                   </div>
-                  {canCreateProposal ? (
-                    <Button variant="outline" className="border-primary/30">
-                      <Vote className="w-4 h-4 mr-2" />
-                      Create Proposal
-                    </Button>
-                  ) : (
-                    <div className="text-right">
-                      <Button variant="outline" disabled className="border-muted/30">
-                        <Vote className="w-4 h-4 mr-2" />
-                        Create Proposal
-                      </Button>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Requires 1,000+ {store.tokenSymbol}
-                      </div>
-                    </div>
-                  )}
+                  <div className="flex items-center space-x-2">
+                    {wallet.connected && (
+                      <WalletConnect variant="compact" />
+                    )}
+                    <CreateProposalDialog store={store} isOwner={isStoreOwner} />
+                  </div>
                 </div>
                 
                 <div className="space-y-4">

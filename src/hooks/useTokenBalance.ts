@@ -7,25 +7,37 @@ interface TokenBalance {
   canCreateProposal: boolean;
 }
 
-export const useTokenBalance = (storeId: string, minProposalTokens: number = 1000): TokenBalance => {
+export const useTokenBalance = (storeId: string, minProposalTokens: number = 1000): TokenBalance & {
+  purchaseTokens: (amount: number) => void;
+} => {
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mock token balance - in real implementation, this would connect to wallet
-    // and check on-chain balance for the specific store's token
-    const mockBalance = Math.floor(Math.random() * 5000); // 0-5000 tokens
+    // Check for existing balance in localStorage
+    const savedBalance = localStorage.getItem(`token_balance_${storeId}`);
+    const initialBalance = savedBalance ? parseFloat(savedBalance) : Math.floor(Math.random() * 5000);
     
     setTimeout(() => {
-      setBalance(mockBalance);
+      setBalance(initialBalance);
       setLoading(false);
+      if (!savedBalance) {
+        localStorage.setItem(`token_balance_${storeId}`, initialBalance.toString());
+      }
     }, 1000);
   }, [storeId]);
+
+  const purchaseTokens = (amount: number) => {
+    const newBalance = balance + amount;
+    setBalance(newBalance);
+    localStorage.setItem(`token_balance_${storeId}`, newBalance.toString());
+  };
 
   return {
     balance,
     loading,
     canVote: balance > 0,
-    canCreateProposal: balance >= minProposalTokens
+    canCreateProposal: balance >= minProposalTokens,
+    purchaseTokens
   };
 };
