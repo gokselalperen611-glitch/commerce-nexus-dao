@@ -1,0 +1,162 @@
+import { Store, Proposal } from '../types';
+
+export const mockStores: Store[] = [
+  {
+    id: '1',
+    name: 'TechHub Electronics',
+    description: 'Premium electronics and gadgets with cutting-edge technology',
+    category: 'Technology',
+    tokenSymbol: 'TECH',
+    tokenName: 'TechHub Token',
+    tokenPrice: 2.45,
+    totalSupply: 10000000,
+    holders: 3420,
+    monthlyRevenue: 125000,
+    rewardRate: 15,
+    governanceScore: 92,
+    imageUrl: '/placeholder.svg',
+    verified: true,
+    launchDate: '2024-01-15',
+    platform: 'Shopify'
+  },
+  {
+    id: '2',
+    name: 'Eco Fashion Co',
+    description: 'Sustainable fashion brand committed to environmental responsibility',
+    category: 'Fashion',
+    tokenSymbol: 'ECO',
+    tokenName: 'Eco Fashion Token',
+    tokenPrice: 1.89,
+    totalSupply: 5000000,
+    holders: 2150,
+    monthlyRevenue: 89000,
+    rewardRate: 20,
+    governanceScore: 88,
+    imageUrl: '/placeholder.svg',
+    verified: true,
+    launchDate: '2024-02-01',
+    platform: 'WooCommerce'
+  },
+  {
+    id: '3',
+    name: 'Artisan Coffee Roasters',
+    description: 'Small-batch coffee roasters with beans from sustainable farms',
+    category: 'Food & Beverage',
+    tokenSymbol: 'BREW',
+    tokenName: 'Brew Token',
+    tokenPrice: 0.75,
+    totalSupply: 2000000,
+    holders: 1890,
+    monthlyRevenue: 67000,
+    rewardRate: 25,
+    governanceScore: 85,
+    imageUrl: '/placeholder.svg',
+    verified: true,
+    launchDate: '2024-03-10',
+    platform: 'Custom'
+  },
+  {
+    id: '4',
+    name: 'Wellness Sanctuary',
+    description: 'Holistic wellness products and premium supplements',
+    category: 'Health & Beauty',
+    tokenSymbol: 'WELL',
+    tokenName: 'Wellness Token',
+    tokenPrice: 3.21,
+    totalSupply: 8000000,
+    holders: 4560,
+    monthlyRevenue: 156000,
+    rewardRate: 12,
+    governanceScore: 94,
+    imageUrl: '/placeholder.svg',
+    verified: true,
+    launchDate: '2023-12-20',
+    platform: 'BigCommerce'
+  },
+  {
+    id: '5',
+    name: 'Urban Garden Supply',
+    description: 'Everything you need for urban gardening and sustainable living',
+    category: 'Home & Garden',
+    tokenSymbol: 'GROW',
+    tokenName: 'Garden Token',
+    tokenPrice: 1.34,
+    totalSupply: 3000000,
+    holders: 987,
+    monthlyRevenue: 43000,
+    rewardRate: 18,
+    governanceScore: 78,
+    imageUrl: '/placeholder.svg',
+    verified: true,
+    launchDate: '2024-04-05',
+    platform: 'Shopify'
+  },
+  {
+    id: '6',
+    name: 'Digital Art Gallery',
+    description: 'Curated digital art and NFT collectibles from emerging artists',
+    category: 'Art & Collectibles',
+    tokenSymbol: 'ART',
+    tokenName: 'Gallery Token',
+    tokenPrice: 5.67,
+    totalSupply: 1500000,
+    holders: 2340,
+    monthlyRevenue: 234000,
+    rewardRate: 10,
+    governanceScore: 91,
+    imageUrl: '/placeholder.svg',
+    verified: true,
+    launchDate: '2023-11-18',
+    platform: 'Custom'
+  }
+];
+
+export const mockProposals: Proposal[] = [
+  {
+    id: '1',
+    title: 'Launch Premium Product Line',
+    description: 'Introduce a new premium electronics line with higher profit margins and exclusive features for token holders.',
+    type: 'product',
+    status: 'active',
+    votesFor: 2840,
+    votesAgainst: 580,
+    totalVotes: 3420,
+    endDate: '2024-08-20',
+    requiredTokens: 1000
+  },
+  {
+    id: '2',
+    title: 'Increase Marketing Budget by 25%',
+    description: 'Allocate additional funds for digital marketing campaigns to expand our customer base.',
+    type: 'operations',
+    status: 'active',
+    votesFor: 1650,
+    votesAgainst: 500,
+    totalVotes: 2150,
+    endDate: '2024-08-18',
+    requiredTokens: 500
+  },
+  {
+    id: '3',
+    title: 'Quarterly Dividend Distribution',
+    description: 'Distribute 30% of quarterly profits as dividends to token holders.',
+    type: 'financial',
+    status: 'passed',
+    votesFor: 1420,
+    votesAgainst: 470,
+    totalVotes: 1890,
+    endDate: '2024-08-05',
+    requiredTokens: 2000
+  }
+];
+
+export const categories = [
+  'All Categories',
+  'Technology',
+  'Fashion',
+  'Food & Beverage',
+  'Health & Beauty',
+  'Home & Garden',
+  'Art & Collectibles',
+  'Services'
+];
