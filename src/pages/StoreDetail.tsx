@@ -26,6 +26,8 @@ import { WalletConnect } from '../components/WalletConnect';
 import { CreateProposalDialog } from '../components/CreateProposalDialog';
 import { TokenPurchaseDialog } from '../components/TokenPurchaseDialog';
 import { RewardSystemNotice } from '../components/RewardSystemNotice';
+import { PurchaseSimulator } from '../components/PurchaseSimulator';
+import { PurchaseHistoryCard } from '../components/PurchaseHistoryCard';
 
 const StoreDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -110,6 +112,10 @@ const StoreDetail = () => {
                   </div>
                   
                   <div className="space-y-2">
+                    <PurchaseSimulator 
+                      store={store}
+                      onTokensEarned={purchaseTokens}
+                    />
                     <TokenPurchaseDialog 
                       store={store}
                       walletConnected={wallet.connected}
@@ -117,7 +123,7 @@ const StoreDetail = () => {
                     />
                     <Button variant="outline" className="w-full border-border/50">
                       <ExternalLink className="w-4 h-4 mr-2" />
-                      Visit Store
+                      Mağazayı Ziyaret Et
                     </Button>
                   </div>
                 </div>
@@ -370,43 +376,50 @@ const StoreDetail = () => {
           </TabsContent>
 
           <TabsContent value="community" className="space-y-6">
-            <h2 className="text-2xl font-bold">Community</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="p-6 bg-gradient-card border-border/50">
-                <h3 className="font-semibold mb-4">Community Stats</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span>Total Members</span>
-                    <span className="font-semibold">{formatNumber(store.holders)}</span>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold">Topluluk</h2>
+                <Card className="p-6 bg-gradient-card border-border/50">
+                  <h3 className="font-semibold mb-4">Topluluk İstatistikleri</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between">
+                      <span>Toplam Üye</span>
+                      <span className="font-semibold">{formatNumber(store.holders)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Aktif Oylama Yapan</span>
+                      <span className="font-semibold">{Math.floor(store.holders * 0.3)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Öneri Başarı Oranı</span>
+                      <span className="font-semibold text-success">78%</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Active Voters</span>
-                    <span className="font-semibold">{Math.floor(store.holders * 0.3)}</span>
+                </Card>
+                
+                <Card className="p-6 bg-gradient-card border-border/50">
+                  <h3 className="font-semibold mb-4">Son Aktiviteler</h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-primary rounded-full"></div>
+                      <span>2 saat önce yeni öneri oluşturuldu</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-success rounded-full"></div>
+                      <span>"Pazarlama Bütçesi" önerisi kabul edildi</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-accent rounded-full"></div>
+                      <span>Bu hafta 234 yeni token sahibi katıldı</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Proposal Success Rate</span>
-                    <span className="font-semibold text-success">78%</span>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </div>
               
-              <Card className="p-6 bg-gradient-card border-border/50">
-                <h3 className="font-semibold mb-4">Recent Activity</h3>
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    <span>New proposal created 2h ago</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-success rounded-full"></div>
-                    <span>Proposal "Marketing Budget" passed</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-accent rounded-full"></div>
-                    <span>234 new token holders this week</span>
-                  </div>
-                </div>
-              </Card>
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold">Alışveriş Geçmişiniz</h2>
+                <PurchaseHistoryCard store={store} />
+              </div>
             </div>
           </TabsContent>
         </Tabs>
