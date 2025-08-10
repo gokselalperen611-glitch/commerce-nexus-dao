@@ -7,6 +7,7 @@ import Navigation from "./components/Navigation";
 import Home from "./pages/Home";
 import Stores from "./pages/Stores";
 import StoreDetail from "./pages/StoreDetail";
+import Governance from "./pages/Governance";
 import Launch from "./pages/Launch";
 import NotFound from "./pages/NotFound";
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/" element={<Home />} />
           <Route path="/stores" element={<Stores />} />
           <Route path="/store/:id" element={<StoreDetail />} />
+          <Route path="/governance" element={<Governance />} />
           <Route path="/launch" element={<Launch />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
