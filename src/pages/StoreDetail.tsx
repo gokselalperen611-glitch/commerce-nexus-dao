@@ -117,9 +117,11 @@ const StoreDetail = () => {
                       onTokensEarned={purchaseTokens}
                     />
                     <TokenPurchaseDialog 
-                      store={store}
-                      walletConnected={wallet.connected}
-                      onPurchaseComplete={purchaseTokens}
+                      storeSymbol={store.tokenSymbol}
+                      onPurchase={async (amount) => {
+                        purchaseTokens(amount);
+                        return { success: true, error: null };
+                      }}
                     />
                     <Button variant="outline" className="w-full border-border/50">
                       <ExternalLink className="w-4 h-4 mr-2" />
@@ -229,7 +231,7 @@ const StoreDetail = () => {
                     {wallet.connected && (
                       <WalletConnect variant="compact" />
                     )}
-                    <CreateProposalDialog store={store} isOwner={isStoreOwner} />
+                    <CreateProposalDialog storeId={store.id} onProposalCreated={() => {}} />
                   </div>
                 </div>
                 
