@@ -14,7 +14,213 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      governance_proposals: {
+        Row: {
+          created_at: string
+          creator_id: string
+          description: string
+          expires_at: string
+          id: string
+          min_tokens_to_vote: number | null
+          proposal_type: string
+          status: string
+          store_id: string
+          title: string
+          votes_against: number | null
+          votes_for: number | null
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          description: string
+          expires_at: string
+          id?: string
+          min_tokens_to_vote?: number | null
+          proposal_type: string
+          status?: string
+          store_id: string
+          title: string
+          votes_against?: number | null
+          votes_for?: number | null
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          description?: string
+          expires_at?: string
+          id?: string
+          min_tokens_to_vote?: number | null
+          proposal_type?: string
+          status?: string
+          store_id?: string
+          title?: string
+          votes_against?: number | null
+          votes_for?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "governance_proposals_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      governance_votes: {
+        Row: {
+          created_at: string
+          id: string
+          proposal_id: string
+          token_weight: number
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          proposal_id: string
+          token_weight: number
+          user_id: string
+          vote_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          proposal_id?: string
+          token_weight?: number
+          user_id?: string
+          vote_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "governance_votes_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "governance_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+          wallet_address: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+          wallet_address?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+          wallet_address?: string | null
+        }
+        Relationships: []
+      }
+      store_memberships: {
+        Row: {
+          id: string
+          is_active: boolean | null
+          joined_at: string
+          membership_type: string
+          store_id: string
+          token_balance: number | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          is_active?: boolean | null
+          joined_at?: string
+          membership_type: string
+          store_id: string
+          token_balance?: number | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          is_active?: boolean | null
+          joined_at?: string
+          membership_type?: string
+          store_id?: string
+          token_balance?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_memberships_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stores: {
+        Row: {
+          created_at: string
+          description: string | null
+          has_premium_membership: boolean | null
+          id: string
+          logo_url: string | null
+          membership_fee_tokens: number | null
+          name: string
+          owner_id: string
+          premium_features: string[] | null
+          premium_fee_tokens: number | null
+          reward_rate: number | null
+          token_name: string
+          token_symbol: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          has_premium_membership?: boolean | null
+          id?: string
+          logo_url?: string | null
+          membership_fee_tokens?: number | null
+          name: string
+          owner_id: string
+          premium_features?: string[] | null
+          premium_fee_tokens?: number | null
+          reward_rate?: number | null
+          token_name: string
+          token_symbol: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          has_premium_membership?: boolean | null
+          id?: string
+          logo_url?: string | null
+          membership_fee_tokens?: number | null
+          name?: string
+          owner_id?: string
+          premium_features?: string[] | null
+          premium_fee_tokens?: number | null
+          reward_rate?: number | null
+          token_name?: string
+          token_symbol?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
