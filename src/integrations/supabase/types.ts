@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
@@ -102,6 +102,59 @@ export type Database = {
           },
         ]
       }
+      products: {
+        Row: {
+          created_at: string
+          dao_tokens_per_purchase: number | null
+          description: string | null
+          external_id: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          name: string
+          price: number
+          stock_quantity: number | null
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dao_tokens_per_purchase?: number | null
+          description?: string | null
+          external_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name: string
+          price: number
+          stock_quantity?: number | null
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dao_tokens_per_purchase?: number | null
+          description?: string | null
+          external_id?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name?: string
+          price?: number
+          stock_quantity?: number | null
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_products_store_id"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -131,6 +184,57 @@ export type Database = {
           wallet_address?: string | null
         }
         Relationships: []
+      }
+      purchases: {
+        Row: {
+          id: string
+          product_id: string
+          purchase_date: string
+          quantity: number
+          status: string
+          store_id: string
+          tokens_earned: number
+          total_price: number
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          purchase_date?: string
+          quantity?: number
+          status?: string
+          store_id: string
+          tokens_earned?: number
+          total_price: number
+          user_id: string
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          purchase_date?: string
+          quantity?: number
+          status?: string
+          store_id?: string
+          tokens_earned?: number
+          total_price?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_purchases_product_id"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_purchases_store_id"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       store_memberships: {
         Row: {
@@ -221,12 +325,67 @@ export type Database = {
         }
         Relationships: []
       }
+      token_distributions: {
+        Row: {
+          created_at: string
+          id: string
+          purchase_id: string | null
+          reason: string
+          store_id: string
+          tokens_amount: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          purchase_id?: string | null
+          reason?: string
+          store_id: string
+          tokens_amount: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          purchase_id?: string | null
+          reason?: string
+          store_id?: string
+          tokens_amount?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_token_distributions_purchase_id"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "purchases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_token_distributions_store_id"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_public_profile: {
+        Args: { profile_user_id: string }
+        Returns: {
+          avatar_url: string
+          created_at: string
+          display_name: string
+          id: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
