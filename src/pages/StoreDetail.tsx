@@ -15,7 +15,8 @@ import {
   BarChart3,
   Calendar,
   Trophy,
-  Loader2
+  Loader2,
+  Sparkles
 } from 'lucide-react';
 import { mockStores, mockProposals } from '../data/mockData';
 import { useTokenBalance } from '../hooks/useTokenBalance';
@@ -28,6 +29,8 @@ import { TokenPurchaseDialog } from '../components/TokenPurchaseDialog';
 import { RewardSystemNotice } from '../components/RewardSystemNotice';
 import { PurchaseSimulator } from '../components/PurchaseSimulator';
 import { PurchaseHistoryCard } from '../components/PurchaseHistoryCard';
+import MetaverseScene from '../components/MetaverseScene';
+import MetaverseBuilder from '../components/MetaverseBuilder';
 
 const StoreDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -191,8 +194,12 @@ const StoreDetail = () => {
 
         {/* Tabs Content */}
         <Tabs defaultValue="governance" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-4 bg-secondary/50">
+          <TabsList className="grid w-full grid-cols-5 bg-secondary/50">
             <TabsTrigger value="governance">Governance</TabsTrigger>
+            <TabsTrigger value="metaverse">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Metaverse
+            </TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="tokenomics">Tokenomics</TabsTrigger>
             <TabsTrigger value="community">Community</TabsTrigger>
@@ -301,6 +308,96 @@ const StoreDetail = () => {
                   ))}
                 </div>
               </>
+            )}
+          </TabsContent>
+
+          <TabsContent value="metaverse" className="space-y-6">
+            {isStoreOwner ? (
+              <MetaverseBuilder 
+                store={store}
+                onSave={(config) => {
+                  console.log('Metaverse config saved:', config);
+                  // Here you would save the config to the database
+                }}
+              />
+            ) : (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold flex items-center">
+                      <Sparkles className="w-6 h-6 mr-2 text-primary" />
+                      {store.name} Metaverse Mağazası
+                    </h2>
+                    <p className="text-muted-foreground mt-1">
+                      Sanal gerçeklik ortamında ürünleri keşfedin
+                    </p>
+                  </div>
+                </div>
+                
+                <Card className="p-6 bg-gradient-card border-border/50">
+                  <MetaverseScene 
+                    store={store}
+                    onProductClick={(productId) => {
+                      console.log('Product clicked:', productId);
+                      // Handle product interaction
+                    }}
+                  />
+                </Card>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <Card className="p-6 bg-gradient-card border-border/50">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Metaverse Visitors</p>
+                        <p className="text-2xl font-bold">1,234</p>
+                      </div>
+                      <Users className="w-8 h-8 text-primary" />
+                    </div>
+                  </Card>
+                  
+                  <Card className="p-6 bg-gradient-card border-border/50">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">3D Products</p>
+                        <p className="text-2xl font-bold">5</p>
+                      </div>
+                      <Sparkles className="w-8 h-8 text-accent" />
+                    </div>
+                  </Card>
+                  
+                  <Card className="p-6 bg-gradient-card border-border/50">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">VR Sales</p>
+                        <p className="text-2xl font-bold">$2,150</p>
+                      </div>
+                      <DollarSign className="w-8 h-8 text-success" />
+                    </div>
+                  </Card>
+                </div>
+
+                <Card className="p-6 bg-gradient-card border-border/50">
+                  <h3 className="font-semibold mb-4">Metaverse Features</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">🌐 Virtual Reality Experience</h4>
+                      <p className="text-sm text-muted-foreground">Navigate through a fully immersive 3D store environment</p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-medium">📦 Interactive Products</h4>
+                      <p className="text-sm text-muted-foreground">Click and explore products in 3D space</p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-medium">🎨 Customizable Environment</h4>
+                      <p className="text-sm text-muted-foreground">Store owners can customize their virtual space</p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-medium">💎 Token Integration</h4>
+                      <p className="text-sm text-muted-foreground">Earn tokens for metaverse interactions</p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
             )}
           </TabsContent>
 
