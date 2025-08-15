@@ -2,7 +2,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Store } from '../types';
-import { TrendingUp, Users, ShieldCheck, ExternalLink } from 'lucide-react';
+import { TrendingUp, Users, ShieldCheck, ExternalLink, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface StoreCardProps {
@@ -42,6 +42,10 @@ const StoreCard = ({ store }: StoreCardProps) => {
               <div className="flex items-center space-x-2">
                 <Badge variant="secondary" className="text-xs">
                   {store.category}
+                </Badge>
+                <Badge variant="outline" className="text-xs border-accent/50 text-accent bg-accent/10">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Metaverse
                 </Badge>
                 {store.verified && (
                   <ShieldCheck className="w-4 h-4 text-success" />

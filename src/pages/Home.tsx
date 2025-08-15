@@ -12,7 +12,8 @@ import {
   ArrowRight,
   CheckCircle,
   Globe,
-  BarChart3
+  BarChart3,
+  Sparkles
 } from 'lucide-react';
 import { mockStores } from '../data/mockData';
 import StoreCard from '../components/StoreCard';
@@ -40,6 +41,11 @@ const Home = () => {
       icon: Shield,
       title: 'Verified Businesses',
       description: 'All stores undergo verification to ensure legitimacy and protect investors'
+    },
+    {
+      icon: Sparkles,
+      title: 'Metaverse Stores',
+      description: 'Experience products in immersive 3D virtual reality environments'
     }
   ];
 
@@ -114,7 +120,7 @@ const Home = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
             {features.map((feature, index) => (
               <Card key={index} className="p-6 bg-gradient-card border-border/50 text-center card-hover">
                 <div className="w-12 h-12 mx-auto mb-4 bg-gradient-primary rounded-xl flex items-center justify-center">

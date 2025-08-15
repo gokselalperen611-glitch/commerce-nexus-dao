@@ -193,13 +193,13 @@ const StoreDetail = () => {
         )}
 
         {/* Tabs Content */}
-        <Tabs defaultValue="governance" className="space-y-8">
+        <Tabs defaultValue="metaverse" className="space-y-8">
           <TabsList className="grid w-full grid-cols-5 bg-secondary/50">
-            <TabsTrigger value="governance">Governance</TabsTrigger>
-            <TabsTrigger value="metaverse">
+            <TabsTrigger value="metaverse" className="bg-gradient-primary text-white border border-primary/20">
               <Sparkles className="w-4 h-4 mr-2" />
-              Metaverse
+              Metaverse VR
             </TabsTrigger>
+            <TabsTrigger value="governance">Governance</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="tokenomics">Tokenomics</TabsTrigger>
             <TabsTrigger value="community">Community</TabsTrigger>
