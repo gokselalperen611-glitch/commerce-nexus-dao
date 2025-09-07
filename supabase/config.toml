@@ -1,1 +1,4 @@
 project_id = "fzbppsomvfhjwxzicbli"
+
+[functions.upload-to-ipfs]
+verify_jwt = false
