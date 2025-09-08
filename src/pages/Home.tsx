@@ -21,6 +21,8 @@ import IPFSUpload from '../components/IPFSUpload';
 import { WalletConnect } from '@/components/WalletConnect';
 import { TokenDeploymentDialog } from '@/components/TokenDeploymentDialog';
 import { StoreTokenManager } from '@/components/StoreTokenManager';
+import { VirtualStoreExperience } from '@/components/VirtualStoreExperience';
+import { NFTGallery } from '@/components/NFTGallery';
 
 const Home = () => {
   const featuredStores = mockStores.slice(0, 3);
@@ -167,6 +169,20 @@ const Home = () => {
               </Card>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Metaverse Experience Section */}
+      <section className="py-20 px-6 bg-secondary/10">
+        <div className="container mx-auto">
+          <VirtualStoreExperience storeId="1" storeName="Demo Store" />
+        </div>
+      </section>
+
+      {/* NFT Gallery Section */}
+      <section className="py-20 px-6">
+        <div className="container mx-auto">
+          <NFTGallery storeId="1" storeName="Demo Store" />
         </div>
       </section>
 
