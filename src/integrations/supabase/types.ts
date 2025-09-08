@@ -276,6 +276,8 @@ export type Database = {
       }
       stores: {
         Row: {
+          chain_id: number | null
+          contract_address: string | null
           created_at: string
           description: string | null
           has_premium_membership: boolean | null
@@ -292,6 +294,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          chain_id?: number | null
+          contract_address?: string | null
           created_at?: string
           description?: string | null
           has_premium_membership?: boolean | null
@@ -308,6 +312,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          chain_id?: number | null
+          contract_address?: string | null
           created_at?: string
           description?: string | null
           has_premium_membership?: boolean | null
@@ -324,6 +330,65 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      token_contracts: {
+        Row: {
+          chain_id: number
+          contract_address: string
+          created_at: string
+          deployed_at: string
+          deployment_tx_hash: string | null
+          description: string | null
+          id: string
+          initial_supply: number
+          is_active: boolean | null
+          owner_id: string
+          store_id: string
+          token_name: string
+          token_symbol: string
+          updated_at: string
+        }
+        Insert: {
+          chain_id: number
+          contract_address: string
+          created_at?: string
+          deployed_at?: string
+          deployment_tx_hash?: string | null
+          description?: string | null
+          id?: string
+          initial_supply: number
+          is_active?: boolean | null
+          owner_id: string
+          store_id: string
+          token_name: string
+          token_symbol: string
+          updated_at?: string
+        }
+        Update: {
+          chain_id?: number
+          contract_address?: string
+          created_at?: string
+          deployed_at?: string
+          deployment_tx_hash?: string | null
+          description?: string | null
+          id?: string
+          initial_supply?: number
+          is_active?: boolean | null
+          owner_id?: string
+          store_id?: string
+          token_name?: string
+          token_symbol?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "token_contracts_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       token_distributions: {
         Row: {

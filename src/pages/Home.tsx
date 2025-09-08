@@ -18,6 +18,9 @@ import {
 import { mockStores } from '../data/mockData';
 import StoreCard from '../components/StoreCard';
 import IPFSUpload from '../components/IPFSUpload';
+import { WalletConnect } from '@/components/WalletConnect';
+import { TokenDeploymentDialog } from '@/components/TokenDeploymentDialog';
+import { StoreTokenManager } from '@/components/StoreTokenManager';
 
 const Home = () => {
   const featuredStores = mockStores.slice(0, 3);
@@ -131,6 +134,38 @@ const Home = () => {
                 <p className="text-sm text-muted-foreground">{feature.description}</p>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Token Management Section */}
+      <section className="py-20 px-6">
+        <div className="container mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">
+              Token <span className="text-gradient">Yönetimi</span>
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Mağazanız için özel token oluşturun ve Web3 özelliklerini yönetin
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <StoreTokenManager storeId="1" storeName="Demo Store" />
+            </div>
+            <div className="space-y-6">
+              <WalletConnect />
+              <Card className="p-6">
+                <h3 className="font-semibold mb-4">Token İşlemleri</h3>
+                <div className="space-y-3">
+                  <TokenDeploymentDialog storeId="1" />
+                  <p className="text-sm text-muted-foreground">
+                    Token oluşturduktan sonra müşterileriniz alışveriş yaparak token kazanabilir ve yönetimde söz sahibi olabilir.
+                  </p>
+                </div>
+              </Card>
+            </div>
           </div>
         </div>
       </section>

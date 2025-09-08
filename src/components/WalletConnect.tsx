@@ -81,8 +81,19 @@ export const WalletConnect = ({ variant = 'default' }: WalletConnectProps) => {
             
             <div>
               <label className="text-sm text-muted-foreground">Balance</label>
-              <div className="font-semibold">{balance.toFixed(4)} ETH</div>
+              <div className="font-semibold">{parseFloat(balance).toFixed(4)} {isPolygon ? 'MATIC' : 'ETH'}</div>
             </div>
+            
+            {chainId && (
+              <div>
+                <label className="text-sm text-muted-foreground">Network</label>
+                <div className="text-sm">
+                  {chainId === 137 ? 'Polygon Mainnet' : 
+                   chainId === 80001 ? 'Mumbai Testnet' : 
+                   `Chain ${chainId}`}
+                </div>
+              </div>
+            )}
           </div>
 
           <Button variant="outline" onClick={disconnectWallet} className="w-full">
