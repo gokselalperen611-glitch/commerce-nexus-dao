@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Wallet, Loader2, LogOut, Copy } from 'lucide-react';
-import { useWallet } from '@/hooks/useWallet';
+import { useWeb3Wallet } from '@/hooks/useWeb3Wallet';
 import { useToast } from '@/hooks/use-toast';
 
 interface WalletConnectProps {
@@ -10,7 +10,7 @@ interface WalletConnectProps {
 }
 
 export const WalletConnect = ({ variant = 'default' }: WalletConnectProps) => {
-  const { connected, address, connecting, balance, connectWallet, disconnectWallet } = useWallet();
+  const { connected, address, connecting, balance, connectWallet, disconnectWallet, chainId, isPolygon } = useWeb3Wallet();
   const { toast } = useToast();
 
   const copyAddress = async () => {
