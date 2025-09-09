@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import { mockStores } from '../data/mockData';
 import StoreCard from '../components/StoreCard';
-import IPFSUpload from '../components/IPFSUpload';
 import { WalletConnect } from '@/components/WalletConnect';
 import { TokenDeploymentDialog } from '@/components/TokenDeploymentDialog';
 import { StoreTokenManager } from '@/components/StoreTokenManager';
@@ -186,19 +185,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* IPFS Upload Demo Section */}
-      <section className="py-20 px-6">
-        <div className="container mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">IPFS Integration Demo</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Upload files to decentralized storage using Pinata Cloud. 
-              This demonstrates how your store assets will be stored permanently on IPFS.
-            </p>
-          </div>
-          <IPFSUpload />
-        </div>
-      </section>
 
       {/* Featured Stores Section */}
       <section className="py-20 px-6 bg-secondary/20">
