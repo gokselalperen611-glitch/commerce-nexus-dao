@@ -153,14 +153,14 @@ const Home = () => {
 
           <div className="grid lg:grid-cols-2 gap-8">
             <div className="space-y-6">
-              <StoreTokenManager storeId="1" storeName="Demo Store" />
+              <StoreTokenManager storeId="00000000-0000-0000-0000-000000000001" storeName="Demo Store" />
             </div>
             <div className="space-y-6">
               <WalletConnect />
               <Card className="p-6">
                 <h3 className="font-semibold mb-4">Token İşlemleri</h3>
                 <div className="space-y-3">
-                  <TokenDeploymentDialog storeId="1" />
+                  <TokenDeploymentDialog storeId="00000000-0000-0000-0000-000000000001" />
                   <p className="text-sm text-muted-foreground">
                     Token oluşturduktan sonra müşterileriniz alışveriş yaparak token kazanabilir ve yönetimde söz sahibi olabilir.
                   </p>
