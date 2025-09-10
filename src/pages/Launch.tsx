@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,6 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 import { 
   Rocket, 
   CheckCircle, 
@@ -28,15 +32,18 @@ import {
 } from 'lucide-react';
 
 const Launch = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     storeName: '',
     storeUrl: '',
     platform: '',
     tokenName: '',
     tokenSymbol: '',
-    initialSupply: '',
-    rewardRate: '',
+    initialSupply: '1000000',
+    rewardRate: '5',
     description: ''
   });
 
@@ -64,6 +71,63 @@ const Launch = () => {
   const handlePrevious = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleCreateStore = async () => {
+    if (!user) {
+      toast({
+        title: "Giriş gerekli",
+        description: "Mağaza oluşturmak için giriş yapmalısınız.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.storeName || !formData.tokenName || !formData.tokenSymbol) {
+      toast({
+        title: "Eksik bilgiler",
+        description: "Lütfen gerekli tüm alanları doldurun.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase
+        .from('stores')
+        .insert({
+          name: formData.storeName,
+          description: formData.description,
+          token_name: formData.tokenName,
+          token_symbol: formData.tokenSymbol.toUpperCase(),
+          owner_id: user.id,
+          reward_rate: parseFloat(formData.rewardRate) / 100,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Mağaza oluşturuldu!",
+        description: "Mağazanız başarıyla oluşturuldu. Token sayfasına yönlendiriliyorsunuz.",
+      });
+
+      // Redirect to store detail page
+      navigate(`/store/${data.id}`);
+    } catch (error: any) {
+      toast({
+        title: "Hata",
+        description: error.message || "Mağaza oluşturulurken hata oluştu.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -418,9 +482,14 @@ const Launch = () => {
                 </div>
               </Card>
               
-              <Button size="lg" className="bg-gradient-primary px-8 glow-effect">
+              <Button 
+                size="lg" 
+                className="bg-gradient-primary px-8 glow-effect"
+                onClick={handleCreateStore}
+                disabled={loading}
+              >
                 <Rocket className="w-5 h-5 mr-2" />
-                Launch Token
+                {loading ? 'Oluşturuluyor...' : 'Mağaza Oluştur'}
               </Button>
             </div>
           )}

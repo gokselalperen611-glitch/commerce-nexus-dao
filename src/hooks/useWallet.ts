@@ -1,72 +1,133 @@
 import { useState, useEffect } from 'react';
+import { toast } from '@/hooks/use-toast';
 
 interface WalletState {
   connected: boolean;
   address: string | null;
   connecting: boolean;
-  balance: number;
+  balance: string | null;
+  chainId: number | null;
 }
 
 export const useWallet = () => {
-  const [wallet, setWallet] = useState<WalletState>({
+  const [walletState, setWalletState] = useState<WalletState>({
     connected: false,
     address: null,
     connecting: false,
-    balance: 0
+    balance: null,
+    chainId: null,
   });
 
   const connectWallet = async () => {
-    setWallet(prev => ({ ...prev, connecting: true }));
-    
-    // Simulate MetaMask connection delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    const mockAddress = `0x${Math.random().toString(16).substring(2, 42).padStart(40, '0')}`;
-    const mockBalance = Math.floor(Math.random() * 10000) / 100; // 0-100 ETH
-    
-    setWallet({
-      connected: true,
-      address: mockAddress,
-      connecting: false,
-      balance: mockBalance
-    });
+    if (typeof window.ethereum === 'undefined') {
+      toast({
+        title: "MetaMask bulunamadı",
+        description: "Lütfen MetaMask yükleyin.",
+        variant: "destructive"
+      });
+      return;
+    }
 
-    localStorage.setItem('wallet_connected', 'true');
-    localStorage.setItem('wallet_address', mockAddress);
-    localStorage.setItem('wallet_balance', mockBalance.toString());
+    try {
+      setWalletState(prev => ({ ...prev, connecting: true }));
+
+      // Request account access
+      const accounts = await window.ethereum.request({
+        method: 'eth_requestAccounts',
+      });
+
+      if (accounts.length > 0) {
+        const address = accounts[0];
+        
+        // Get balance
+        const balance = await window.ethereum.request({
+          method: 'eth_getBalance',
+          params: [address, 'latest'],
+        });
+
+        // Get chain ID
+        const chainId = await window.ethereum.request({
+          method: 'eth_chainId',
+        });
+
+        setWalletState({
+          connected: true,
+          address,
+          connecting: false,
+          balance: (parseInt(balance, 16) / Math.pow(10, 18)).toFixed(4),
+          chainId: parseInt(chainId, 16),
+        });
+
+        localStorage.setItem('walletConnected', 'true');
+        
+        toast({
+          title: "Cüzdan bağlandı",
+          description: `Adres: ${address.slice(0, 6)}...${address.slice(-4)}`,
+        });
+      }
+    } catch (error: any) {
+      setWalletState(prev => ({ ...prev, connecting: false }));
+      toast({
+        title: "Bağlantı hatası",
+        description: error.message || "Cüzdan bağlanırken hata oluştu",
+        variant: "destructive"
+      });
+    }
   };
 
   const disconnectWallet = () => {
-    setWallet({
+    setWalletState({
       connected: false,
       address: null,
       connecting: false,
-      balance: 0
+      balance: null,
+      chainId: null,
     });
-    localStorage.removeItem('wallet_connected');
-    localStorage.removeItem('wallet_address');
-    localStorage.removeItem('wallet_balance');
+    localStorage.removeItem('walletConnected');
+    
+    toast({
+      title: "Cüzdan bağlantısı kesildi",
+    });
   };
 
-  // Restore wallet connection on page load
+  // Auto-connect on mount if previously connected
   useEffect(() => {
-    const isConnected = localStorage.getItem('wallet_connected');
-    const address = localStorage.getItem('wallet_address');
-    const balance = localStorage.getItem('wallet_balance');
-
-    if (isConnected && address && balance) {
-      setWallet({
-        connected: true,
-        address,
-        connecting: false,
-        balance: parseFloat(balance)
-      });
+    const wasConnected = localStorage.getItem('walletConnected');
+    if (wasConnected && typeof window.ethereum !== 'undefined') {
+      connectWallet();
     }
   }, []);
 
+  // Listen for account changes
+  useEffect(() => {
+    if (typeof window.ethereum !== 'undefined') {
+      const handleAccountsChanged = (accounts: string[]) => {
+        if (accounts.length === 0) {
+          disconnectWallet();
+        } else if (accounts[0] !== walletState.address) {
+          connectWallet();
+        }
+      };
+
+      const handleChainChanged = () => {
+        window.location.reload();
+      };
+
+      window.ethereum.on('accountsChanged', handleAccountsChanged);
+      window.ethereum.on('chainChanged', handleChainChanged);
+
+      return () => {
+        if (window.ethereum.removeListener) {
+          window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+          window.ethereum.removeListener('chainChanged', handleChainChanged);
+        }
+      };
+    }
+  }, [walletState.address]);
+
   return {
-    ...wallet,
+    ...walletState,
     connectWallet,
-    disconnectWallet
+    disconnectWallet,
   };
 };

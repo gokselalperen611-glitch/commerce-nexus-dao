@@ -1,9 +1,23 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ShoppingBag, BarChart3, Vote, Plus, Wallet } from 'lucide-react';
+import { ShoppingBag, BarChart3, Vote, Plus, User, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const Navigation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   const navItems = [
     { path: '/', label: 'Home', icon: ShoppingBag },
@@ -46,10 +60,31 @@ const Navigation = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <Button variant="outline" className="hidden sm:flex items-center space-x-2 border-border/50 hover:border-primary/50">
-              <Wallet className="w-4 h-4" />
-              <span>Connect Wallet</span>
-            </Button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="flex items-center space-x-2 border-border/50 hover:border-primary/50">
+                    <User className="w-4 h-4" />
+                    <span>{user.user_metadata?.display_name || user.email?.split('@')[0]}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={handleSignOut} className="text-destructive cursor-pointer">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Çıkış Yap
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button 
+                variant="outline" 
+                className="hidden sm:flex items-center space-x-2 border-border/50 hover:border-primary/50"
+                onClick={() => navigate('/auth')}
+              >
+                <User className="w-4 h-4" />
+                <span>Giriş Yap</span>
+              </Button>
+            )}
             
             <div className="md:hidden">
               <Button variant="ghost" size="sm">

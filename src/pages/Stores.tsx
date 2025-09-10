@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,15 +11,61 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Search, Filter, TrendingUp, Users, Star } from 'lucide-react';
-import { mockStores, categories } from '../data/mockData';
+import { supabase } from '@/integrations/supabase/client';
 import StoreCard from '../components/StoreCard';
 
 const Stores = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
-  const [sortBy, setSortBy] = useState('holders');
+  const [sortBy, setSortBy] = useState('created_at');
+  const [stores, setStores] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredStores = mockStores
+  const categories = ['All Categories', 'Technology', 'Fashion', 'Food & Beverage', 'Health', 'Entertainment'];
+
+  useEffect(() => {
+    fetchStores();
+  }, []);
+
+  const fetchStores = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('stores')
+        .select(`
+          *,
+          store_memberships!inner(id),
+          products(id)
+        `);
+
+      if (error) throw error;
+
+      // Transform data to match expected format
+      const transformedStores = data.map(store => ({
+        id: store.id,
+        name: store.name,
+        description: store.description || 'Bu mağaza henüz açıklama eklememiş.',
+        tokenName: store.token_name,
+        tokenSymbol: store.token_symbol,
+        logoUrl: store.logo_url || '/placeholder.svg',
+        holders: store.store_memberships?.length || 0,
+        products: store.products?.length || 0,
+        category: 'Technology', // Default category
+        governanceScore: Math.floor(Math.random() * 100), // Mock data
+        monthlyRevenue: Math.floor(Math.random() * 100000), // Mock data
+        tokenPrice: Math.random() * 10, // Mock data
+        created_at: store.created_at
+      }));
+
+      setStores(transformedStores);
+    } catch (error: any) {
+      console.error('Error fetching stores:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredStores = stores
     .filter(store => {
       const matchesSearch = store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           store.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -37,14 +83,16 @@ const Stores = () => {
           return b.governanceScore - a.governanceScore;
         case 'price':
           return b.tokenPrice - a.tokenPrice;
+        case 'created_at':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         default:
           return 0;
       }
     });
 
-  const totalStores = mockStores.length;
-  const totalHolders = mockStores.reduce((sum, store) => sum + store.holders, 0);
-  const totalVolume = mockStores.reduce((sum, store) => sum + store.monthlyRevenue, 0);
+  const totalStores = stores.length;
+  const totalHolders = stores.reduce((sum, store) => sum + store.holders, 0);
+  const totalVolume = stores.reduce((sum, store) => sum + store.monthlyRevenue, 0);
 
   return (
     <div className="min-h-screen pt-20 px-6 pb-12">
@@ -135,10 +183,11 @@ const Stores = () => {
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="holders">Most Holders</SelectItem>
-                  <SelectItem value="revenue">Highest Revenue</SelectItem>
-                  <SelectItem value="governance">Best Governance</SelectItem>
-                  <SelectItem value="price">Token Price</SelectItem>
+                  <SelectItem value="created_at">En Yeni</SelectItem>
+                  <SelectItem value="holders">En Çok Üye</SelectItem>
+                  <SelectItem value="revenue">En Yüksek Gelir</SelectItem>
+                  <SelectItem value="governance">En İyi Yönetişim</SelectItem>
+                  <SelectItem value="price">Token Fiyatı</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -173,7 +222,17 @@ const Stores = () => {
         </div>
 
         {/* Store Grid */}
-        {filteredStores.length > 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Card key={i} className="p-6 animate-pulse">
+                <div className="h-32 bg-muted rounded mb-4"></div>
+                <div className="h-4 bg-muted rounded mb-2"></div>
+                <div className="h-3 bg-muted rounded w-3/4"></div>
+              </Card>
+            ))}
+          </div>
+        ) : filteredStores.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredStores.map((store) => (
               <StoreCard key={store.id} store={store} />
@@ -182,9 +241,9 @@ const Stores = () => {
         ) : (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-lg font-semibold mb-2">No stores found</h3>
+            <h3 className="text-lg font-semibold mb-2">Mağaza bulunamadı</h3>
             <p className="text-muted-foreground">
-              Try adjusting your search terms or filters
+              Arama terimlerinizi veya filtrelerinizi değiştirmeyi deneyin
             </p>
           </div>
         )}
