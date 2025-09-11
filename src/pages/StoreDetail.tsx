@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,13 +17,18 @@ import {
   Calendar,
   Trophy,
   Loader2,
-  Sparkles
+  Sparkles,
+  Package,
+  Settings,
+  History
 } from 'lucide-react';
 import { mockStores, mockProposals } from '../data/mockData';
 import { useTokenBalance } from '../hooks/useTokenBalance';
 import { TokenRequiredMessage } from '../components/TokenRequiredMessage';
 import { useWallet } from '../hooks/useWallet';
 import { useStoreOwner } from '../hooks/useStoreOwner';
+import { useAuth } from '../hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { WalletConnect } from '../components/WalletConnect';
 import { CreateProposalDialog } from '../components/CreateProposalDialog';
 import { TokenPurchaseDialog } from '../components/TokenPurchaseDialog';
@@ -31,12 +37,58 @@ import { PurchaseSimulator } from '../components/PurchaseSimulator';
 import { PurchaseHistoryCard } from '../components/PurchaseHistoryCard';
 import MetaverseScene from '../components/MetaverseScene';
 import MetaverseBuilder from '../components/MetaverseBuilder';
+import ProductGrid from '../components/ProductGrid';
+import ProductManager from '../components/ProductManager';
+import PurchaseHistory from '../components/PurchaseHistory';
 
 const StoreDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
+  const [realStore, setRealStore] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const store = mockStores.find(s => s.id === id);
 
-  if (!store) {
+  // Check if user owns this store
+  const [isOwner, setIsOwner] = useState(false);
+
+  useEffect(() => {
+    if (id) {
+      fetchRealStore();
+    }
+  }, [id]);
+
+  const fetchRealStore = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('stores')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      
+      setRealStore(data);
+      
+      // Check if current user owns this store
+      if (user && data.owner_id === user.id) {
+        setIsOwner(true);
+      }
+    } catch (error) {
+      console.error('Error fetching store:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!store && !realStore) {
+    if (loading) {
+      return (
+        <div className="min-h-screen pt-20 px-6 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin" />
+        </div>
+      );
+    }
+    
     return (
       <div className="min-h-screen pt-20 px-6 flex items-center justify-center">
         <div className="text-center">
@@ -46,6 +98,9 @@ const StoreDetail = () => {
       </div>
     );
   }
+
+  // Use real store data if available, otherwise fallback to mock
+  const displayStore = realStore || store;
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -63,10 +118,10 @@ const StoreDetail = () => {
   };
 
   const storeProposals = mockProposals.filter(p => p.id <= '2'); // Mock proposals for this store
-  const { balance, loading, canVote, canCreateProposal, purchaseTokens } = useTokenBalance(store.id, 1000);
+  const { balance, loading: tokenLoading, canVote, canCreateProposal, purchaseTokens } = useTokenBalance(id || store?.id || "1", 1000);
   const wallet = useWallet();
   const { checkOwnership } = useStoreOwner(wallet.address);
-  const isStoreOwner = checkOwnership(store.id);
+  const isStoreOwner = checkOwnership(id || store?.id || "1");
 
   return (
     <div className="min-h-screen pt-20 px-6 pb-12">
@@ -83,24 +138,27 @@ const StoreDetail = () => {
                 </div>
                 <div>
                   <div className="flex items-center space-x-2 mb-1">
-                    <h1 className="text-3xl font-bold">{store.name}</h1>
-                    {store.verified && <ShieldCheck className="w-6 h-6 text-success" />}
+                    <h1 className="text-3xl font-bold">{displayStore?.name || store?.name}</h1>
+                    {(displayStore?.verified || store?.verified) && <ShieldCheck className="w-6 h-6 text-success" />}
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Badge variant="secondary">{store.category}</Badge>
-                    <Badge variant="outline">{store.platform}</Badge>
+                    <Badge variant="secondary">{displayStore?.category || store?.category || "E-commerce"}</Badge>
+                    <Badge variant="outline">Web3 DAO</Badge>
+                    {isOwner && <Badge className="bg-gradient-primary">Sahibi</Badge>}
                   </div>
                 </div>
               </div>
-              <p className="text-muted-foreground text-lg mb-4">{store.description}</p>
+              <p className="text-muted-foreground text-lg mb-4">
+                {displayStore?.description || store?.description}
+              </p>
               <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-1">
                   <Calendar className="w-4 h-4" />
-                  <span>Launched {store.launchDate}</span>
+                  <span>Token: {displayStore?.token_symbol || store?.tokenSymbol}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Trophy className="w-4 h-4" />
-                  <span>Governance Score: {store.governanceScore}/100</span>
+                  <span>Reward Rate: {displayStore?.reward_rate ? (displayStore.reward_rate * 100).toFixed(0) : store?.rewardRate}%</span>
                 </div>
               </div>
             </div>
@@ -115,20 +173,22 @@ const StoreDetail = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <PurchaseSimulator 
-                      store={store}
-                      onTokensEarned={purchaseTokens}
-                    />
+                    {store && (
+                      <PurchaseSimulator 
+                        store={store}
+                        onTokensEarned={purchaseTokens}
+                      />
+                    )}
                     <TokenPurchaseDialog 
-                      storeSymbol={store.tokenSymbol}
+                      storeSymbol={displayStore?.token_symbol || store?.tokenSymbol || "TOKEN"}
                       onPurchase={async (amount) => {
                         purchaseTokens(amount);
                         return { success: true, error: null };
                       }}
                     />
                     <Button variant="outline" className="w-full border-border/50">
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      Mağazayı Ziyaret Et
+                      <Package className="w-4 h-4 mr-2" />
+                      Ürünleri Görüntüle
                     </Button>
                   </div>
                 </div>
@@ -193,28 +253,81 @@ const StoreDetail = () => {
         )}
 
         {/* Tabs Content */}
-        <Tabs defaultValue="metaverse" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-5 bg-secondary/50">
+        <Tabs defaultValue="products" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-7 bg-secondary/50">
+            <TabsTrigger value="products">
+              <Package className="w-4 h-4 mr-2" />
+              Ürünler
+            </TabsTrigger>
             <TabsTrigger value="metaverse" className="bg-gradient-primary text-white border border-primary/20">
               <Sparkles className="w-4 h-4 mr-2" />
               Metaverse VR
             </TabsTrigger>
-            <TabsTrigger value="governance">Governance</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="tokenomics">Tokenomics</TabsTrigger>
-            <TabsTrigger value="community">Community</TabsTrigger>
+            <TabsTrigger value="governance">
+              <Vote className="w-4 h-4 mr-2" />
+              Yönetişim
+            </TabsTrigger>
+            <TabsTrigger value="history">
+              <History className="w-4 h-4 mr-2" />
+              Geçmiş
+            </TabsTrigger>
+            <TabsTrigger value="analytics">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Analitik
+            </TabsTrigger>
+            {isOwner && (
+              <TabsTrigger value="management">
+                <Settings className="w-4 h-4 mr-2" />
+                Yönetim
+              </TabsTrigger>
+            )}
+            <TabsTrigger value="community">
+              <Users className="w-4 h-4 mr-2" />
+              Topluluk
+            </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="products" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold">Mağaza Ürünleri</h2>
+                <p className="text-muted-foreground">
+                  {displayStore?.name || store?.name} mağazasındaki ürünleri keşfedin ve satın alın
+                </p>
+              </div>
+            </div>
+            
+            <ProductGrid 
+              storeId={id || store?.id || "1"}
+              storeName={displayStore?.name || store?.name || "Mağaza"}
+              tokenSymbol={displayStore?.token_symbol || store?.tokenSymbol || "TOKEN"}
+            />
+          </TabsContent>
+
+          <TabsContent value="history" className="space-y-6">
+            <PurchaseHistory 
+              storeId={id || store?.id || "1"}
+              storeName={displayStore?.name || store?.name || "Mağaza"}
+              tokenSymbol={displayStore?.token_symbol || store?.tokenSymbol || "TOKEN"}
+            />
+          </TabsContent>
+
+          {isOwner && (
+            <TabsContent value="management" className="space-y-6">
+              <ProductManager storeId={id || store?.id || "1"} />
+            </TabsContent>
+          )}
+
           <TabsContent value="governance" className="space-y-6">
-            {loading ? (
+            {tokenLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
                 <span className="ml-2 text-muted-foreground">Checking token balance...</span>
               </div>
             ) : balance === 0 ? (
               <TokenRequiredMessage 
-                storeName={store.name}
-                tokenSymbol={store.tokenSymbol}
+                storeName={displayStore?.name || store?.name || "Mağaza"}
+                tokenSymbol={displayStore?.token_symbol || store?.tokenSymbol || "TOKEN"}
                 feature="governance"
               />
             ) : (
@@ -238,7 +351,7 @@ const StoreDetail = () => {
                     {wallet.connected && (
                       <WalletConnect variant="compact" />
                     )}
-                    <CreateProposalDialog storeId={store.id} onProposalCreated={() => {}} />
+                    <CreateProposalDialog storeId={id || store?.id || "1"} onProposalCreated={() => {}} />
                   </div>
                 </div>
                 
