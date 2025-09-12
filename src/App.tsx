@@ -9,6 +9,7 @@ import Stores from "./pages/Stores";
 import StoreDetail from "./pages/StoreDetail";
 import Governance from "./pages/Governance";
 import Launch from "./pages/Launch";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import StoreGovernance from "./pages/StoreGovernance";
@@ -26,6 +27,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/stores" element={<Stores />} />
           <Route path="/store/:id" element={<StoreDetail />} />
           <Route path="/store/:id/governance" element={

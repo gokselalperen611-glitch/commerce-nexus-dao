@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ShoppingBag, BarChart3, Vote, Plus, User, LogOut } from 'lucide-react';
+import { ShoppingBag, BarChart3, Vote, Plus, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import {
   DropdownMenu,
@@ -21,6 +21,7 @@ const Navigation = () => {
 
   const navItems = [
     { path: '/', label: 'Home', icon: ShoppingBag },
+    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/stores', label: 'Stores', icon: BarChart3 },
     { path: '/governance', label: 'Governance', icon: Vote },
     { path: '/launch', label: 'Launch Token', icon: Plus },
