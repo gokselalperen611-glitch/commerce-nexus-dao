@@ -18,9 +18,11 @@ import {
   Loader2,
   Trophy,
   BarChart3,
-  Calendar
+  Calendar,
+  Bell
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useNotificationEffects } from '@/hooks/useNotificationEffects';
 import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 
@@ -59,6 +61,7 @@ interface GovernanceActivity {
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { triggerDemoNotifications } = useNotificationEffects();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats>({
     totalTokens: 0,
@@ -222,16 +225,27 @@ const Dashboard = () => {
       <div className="container mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center space-x-4 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center">
-              <Wallet className="w-6 h-6 text-white" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center">
+                <Wallet className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold">Dashboard</h1>
+                <p className="text-muted-foreground">
+                  Hoş geldin, {user.user_metadata?.display_name || user.email?.split('@')[0]}!
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold">Dashboard</h1>
-              <p className="text-muted-foreground">
-                Hoş geldin, {user.user_metadata?.display_name || user.email?.split('@')[0]}!
-              </p>
-            </div>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={triggerDemoNotifications}
+              className="flex items-center space-x-2"
+            >
+              <Bell className="w-4 h-4" />
+              <span>Demo Bildirimler</span>
+            </Button>
           </div>
         </div>
 

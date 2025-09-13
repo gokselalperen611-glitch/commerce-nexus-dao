@@ -15,6 +15,7 @@ import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
+import { useNotifications } from '@/contexts/NotificationContext';
 import { ShoppingCart, DollarSign, Coins, Package, CheckCircle } from 'lucide-react';
 
 interface Product {
@@ -47,6 +48,7 @@ export function PurchaseDialog({
   onPurchaseComplete
 }: PurchaseDialogProps) {
   const { user } = useAuth();
+  const { notify } = useNotifications();
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
   const [isPurchaseComplete, setIsPurchaseComplete] = useState(false);
@@ -93,10 +95,15 @@ export function PurchaseDialog({
 
       setIsPurchaseComplete(true);
       
-      toast({
-        title: "Satın alma başarılı!",
-        description: `${quantity}x ${product.name} satın aldınız ve ${totalTokens} ${tokenSymbol} token kazandınız.`,
-      });
+      // Show success notification
+      notify.success(
+        "Satın alma başarılı!",
+        `${quantity}x ${product.name} satın aldınız ve ${totalTokens} ${tokenSymbol} token kazandınız.`,
+        {
+          actionUrl: "/dashboard",
+          actionText: "Dashboard'a Git"
+        }
+      );
 
       setTimeout(() => {
         onPurchaseComplete();
@@ -107,11 +114,10 @@ export function PurchaseDialog({
 
     } catch (error: any) {
       console.error('Purchase error:', error);
-      toast({
-        title: "Satın alma hatası",
-        description: error.message || "Satın alma işleminde hata oluştu.",
-        variant: "destructive"
-      });
+      notify.error(
+        "Satın alma hatası",
+        error.message || "Satın alma işleminde hata oluştu."
+      );
     } finally {
       setLoading(false);
     }

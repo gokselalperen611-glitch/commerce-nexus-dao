@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ShoppingBag, BarChart3, Vote, Plus, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { NotificationCenter } from './NotificationCenter';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,6 +62,7 @@ const Navigation = () => {
           </div>
 
           <div className="flex items-center space-x-4">
+            <NotificationCenter />
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
